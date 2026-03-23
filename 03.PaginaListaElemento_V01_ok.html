@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista Completa</title>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js";
+
+    // 🔧 INSERISCI QUI I TUOI DATI SUPABASE
+    const supabaseUrl = "https://wuaptfrhsbeezdmwlmyh.supabase.co";
+    const supabaseKey = "sb_publishable_jccRCJKOQzMlGTBj1dRbXQ_JayL41tV";
+
+    window.supabase = createClient(supabaseUrl, supabaseKey);
+  </script>
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f7fb;
+      padding: 2rem;
+      color: #222;
+      font-size: 0.9rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 10px;
+      border: 1px solid #e1e5f0;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.3rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      padding: 0.7rem;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+    }
+
+    th {
+      background: #f3f4f6;
+      font-weight: 600;
+    }
+
+    button {
+      padding: 0.4rem 0.7rem;
+      border-radius: 6px;
+      border: 1px solid #cbd5f5;
+      background: #e5edff;
+      color: #1d3bb8;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    button.secondary {
+      background: #fff;
+      color: #374151;
+      margin-right: 0.5rem;
+    }
+
+    .top-buttons {
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1 id="titolo"></h1>
+
+    <div class="top-buttons">
+      <button class="secondary" onclick="tornaHome()">Torna alla Home</button>
+      <button onclick="scaricaCSV()">Scarica in CSV</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Testo</th>
+          <th>Note</th>
+          <th>Link</th>
+          <th>Azioni</th>
+        </tr>
+      </thead>
+      <tbody id="tabella"></tbody>
+    </table>
+  </div>
+
+  <script type="module">
+    const params = new URLSearchParams(window.location.search);
+    const lista = params.get("lista");
+
+    if (!lista) {
+      alert("Errore: nessuna lista specificata.");
+    }
+
+    document.getElementById("titolo").textContent =
+      "Lista completa: " + lista.charAt(0).toUpperCase() + lista.slice(1);
+
+    // 📌 Carica tutti gli elementi
+    async function caricaLista() {
+      const { data, error } = await supabase
+        .from(lista)
+        .select("*")
+        .order("id", { ascending: true });
+
+      if (error) {
+        console.error(error);
+        alert("Errore nel caricamento della lista.");
+        return;
+      }
+
+      const tbody = document.getElementById("tabella");
+      tbody.innerHTML = "";
+
+      data.forEach(riga => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>${riga.testo || ""}</td>
+          <td>${riga.note || ""}</td>
+          <td>${riga.link || ""}</td>
+          <td>
+            <button onclick="apriElemento(${riga.id})">Apri Elemento</button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    caricaLista();
+
+    // 🔗 Apri elemento
+    window.apriElemento = function (id) {
+      window.location.href = "02.PaginaVediElemento_V01_ok.html?lista=" + lista + "&id=" + id;
+    };
+
+    // 🏠 Torna alla Home
+    window.tornaHome = function () {
+      window.location.href = "00.PaginaHome_Liste V08_aggiungi2.html";
+    };
+
+    // 📥 Scarica CSV
+    window.scaricaCSV = function () {
+      const righe = [...document.querySelectorAll("#tabella tr")].map(tr =>
+        [...tr.children].slice(0, 3).map(td => `"${td.textContent.replace(/"/g, '""')}"`).join(",")
+      );
+
+      const csv = "Testo,Note,Link\n" + righe.join("\n");
+
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = lista + ".csv";
+      a.click();
+
+      URL.revokeObjectURL(url);
+    };
+  </script>
+
+</body>
+</html>

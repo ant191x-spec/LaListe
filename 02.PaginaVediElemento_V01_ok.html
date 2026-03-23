@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Dettagli Elemento</title>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js";
+
+    // 🔧 INSERISCI QUI I TUOI DATI SUPABASE
+    const supabaseUrl = "https://wuaptfrhsbeezdmwlmyh.supabase.co";
+    const supabaseKey = "sb_publishable_jccRCJKOQzMlGTBj1dRbXQ_JayL41tV";
+
+    window.supabase = createClient(supabaseUrl, supabaseKey);
+  </script>
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f7fb;
+      padding: 2rem;
+      color: #222;
+      font-size: 0.9rem;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 10px;
+      border: 1px solid #e1e5f0;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+      font-size: 0.9rem;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.2rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.3rem;
+      border-radius: 6px;
+      border: 1px solid #cbd5f5;
+      font-size: 0.9rem;
+      background: #f3f4f6;
+    }
+
+    button {
+      margin-top: 1.5rem;
+      padding: 0.6rem 0.9rem;
+      border-radius: 6px;
+      border: 1px solid #cbd5f5;
+      background: #e5edff;
+      color: #1d3bb8;
+      cursor: pointer;
+      width: 100%;
+      font-size: 0.9rem;
+    }
+
+    button.secondary {
+      background: #fff;
+      color: #374151;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1 id="titolo">Dettagli elemento</h1>
+
+    <label>Testo</label>
+    <input type="text" id="campo-testo" readonly>
+
+    <label>Note</label>
+    <textarea id="campo-note" rows="4" readonly></textarea>
+
+    <label>Link</label>
+    <input type="text" id="campo-link" readonly>
+
+    <button class="secondary" onclick="tornaLista()">Torna alla Lista</button>
+  </div>
+
+  <script type="module">
+    // 📌 Legge parametri URL
+    const params = new URLSearchParams(window.location.search);
+    const lista = params.get("lista");
+    const id = params.get("id");
+
+    if (!lista || !id) {
+      alert("Errore: parametri mancanti.");
+    }
+
+    document.getElementById("titolo").textContent =
+      "Dettagli Elemento - " + lista.charAt(0).toUpperCase() + lista.slice(1);
+
+    // 📌 Carica l'elemento da Supabase
+    async function caricaElemento() {
+      const { data, error } = await supabase
+        .from(lista)
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error || !data) {
+        alert("Errore nel caricamento dell'elemento.");
+        console.error(error);
+        return;
+      }
+
+      document.getElementById("campo-testo").value = data.testo || "";
+      document.getElementById("campo-note").value = data.note || "";
+      document.getElementById("campo-link").value = data.link || "";
+    }
+
+    caricaElemento();
+
+    // 🔙 Torna alla Lista
+    window.tornaLista = function () {
+      window.location.href = "03.PaginaListaElemento_V01_ok.html?lista=" + lista;
+    };
+  </script>
+
+</body>
+</html>

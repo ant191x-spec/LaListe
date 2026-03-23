@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Aggiungi Elemento</title>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js";
+
+    // 🔧 INSERISCI QUI I TUOI DATI SUPABASE
+    const supabaseUrl = "https://wuaptfrhsbeezdmwlmyh.supabase.co";
+    const supabaseKey = "sb_publishable_jccRCJKOQzMlGTBj1dRbXQ_JayL41tV";
+
+    // CREA IL CLIENT
+    window.supabase = createClient(supabaseUrl, supabaseKey);
+  </script>
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f7fb;
+      padding: 2rem;
+      color: #222;
+      font-size: 0.9rem;
+    }
+
+    .notifica {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+      padding: 0.8rem 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      display: none;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 10px;
+      border: 1px solid #e1e5f0;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+      font-size: 0.9rem;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.2rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.3rem;
+      border-radius: 6px;
+      border: 1px solid #cbd5f5;
+      font-size: 0.9rem;
+    }
+
+    button {
+      margin-top: 1.5rem;
+      padding: 0.6rem 0.9rem;
+      border-radius: 6px;
+      border: 1px solid #cbd5f5;
+      background: #e5edff;
+      color: #1d3bb8;
+      cursor: pointer;
+      width: 100%;
+      font-size: 0.9rem;
+    }
+
+    button:hover {
+      background: #d8e3ff;
+    }
+
+    button.secondary {
+      background: #fff;
+      color: #374151;
+    }
+
+    button.secondary:hover {
+      background: #f3f4f6;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 🔔 NOTIFICA VERDE -->
+  <div id="notifica" class="notifica">Elemento aggiunto con successo!</div>
+
+  <div class="container">
+    <h1 id="titolo"></h1>
+
+    <label>Testo</label>
+    <input type="text" id="campo-testo" placeholder="Inserisci il testo">
+
+    <label>Note</label>
+    <textarea id="campo-note" rows="4" placeholder="Aggiungi eventuali note"></textarea>
+
+    <label>Link</label>
+    <input type="text" id="campo-link" placeholder="https://...">
+
+    <button onclick="salvaElemento()">Salva Elemento</button>
+
+    <!-- 🔙 TORNA ALLA HOME -->
+    <button class="secondary" onclick="tornaHome()">Torna alla Home</button>
+  </div>
+
+  <script type="module">
+    const utente = "utente1";
+
+    // 📌 Recupera parametri URL
+    const params = new URLSearchParams(window.location.search);
+    const lista = params.get("lista");
+    const ok = params.get("ok");
+
+    // 📌 Mostra notifica se ok=1
+    if (ok === "1") {
+      const box = document.getElementById("notifica");
+      box.style.display = "block";
+
+      setTimeout(() => {
+        box.style.display = "none";
+      }, 3000);
+    }
+
+    // 📌 Titolo dinamico
+    document.getElementById("titolo").textContent =
+      "Aggiungi Elemento alla Lista " + (lista ? lista.charAt(0).toUpperCase() + lista.slice(1) : "");
+
+    // 📌 Salva l'elemento su Supabase
+    window.salvaElemento = async function () {
+      const testo = document.getElementById("campo-testo").value.trim();
+      const note = document.getElementById("campo-note").value.trim();
+      const link = document.getElementById("campo-link").value.trim();
+
+      if (!testo) {
+        alert("Il campo Testo è obbligatorio.");
+        return;
+      }
+
+      const { error } = await supabase
+        .from(lista)
+        .insert({
+          utente: utente,
+          testo: testo,
+          note: note,
+          link: link
+        });
+
+      if (error) {
+        console.error("Errore salvataggio:", error);
+        alert("Errore durante il salvataggio.");
+        return;
+      }
+
+      // 🔄 Ricarica la pagina con notifica
+      window.location.href = window.location.pathname + "?lista=" + lista + "&ok=1";
+    };
+
+    // 🔙 Torna alla Home
+    window.tornaHome = function () {
+      window.location.href = "00.PaginaHome_Liste V08_aggiungi2.html";
+    };
+  </script>
+</body>
+</html>
