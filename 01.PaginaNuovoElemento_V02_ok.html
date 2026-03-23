@@ -2,6 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- 🔥 ESSENZIALE PER MOBILE -->
   <title>Aggiungi Elemento</title>
 
   <script type="module">
@@ -92,6 +93,27 @@
     button.secondary:hover {
       background: #f3f4f6;
     }
+
+    /* 📱 MOBILE FIXES — senza cambiare dimensioni */
+    @media (max-width: 480px) {
+
+      header {
+        padding: 1rem;
+      }
+
+      main {
+        padding: 1rem;
+      }
+
+      .grid {
+        grid-template-columns: 1fr; /* una card per riga */
+      }
+
+      .card {
+        padding: 1.2rem; /* leggermente più compatto */
+      }
+    }
+
   </style>
 </head>
 
