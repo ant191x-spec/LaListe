@@ -157,7 +157,7 @@
   <div class="container">
 <div class="title-row">
   <button class="btn-plus" onclick="salvaElemento()">+</button>
-  <h1 id="titolo">Aggiungi Elemento alla Lista Musica</h1>
+  <h1 id="titolo">Aggiungi Elemento: Musica</h1>
 </div>
 
     <label>Testo</label>
@@ -194,7 +194,7 @@
         listaCorrente = btn.dataset.tab;
 
         document.getElementById("titolo").textContent =
-          "Aggiungi Elemento alla Lista " +
+          "Aggiungi Elemento: " +
           listaCorrente.charAt(0).toUpperCase() + listaCorrente.slice(1);
       });
     });
