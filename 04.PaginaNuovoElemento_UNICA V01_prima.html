@@ -110,6 +110,35 @@
       background: #fff;
       color: #374151;
     }
+
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.btn-plus {
+  width: 0.29rem;
+  height: 0.29rem;
+  padding: 0.9rem; /* rende cliccabile ma mantiene il quadrato piccolo */
+  margin-bottom: 0.8rem;
+      font-size: 1.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: 1px solid #cbd5f5;
+  background: #e5edff;
+  cursor: pointer;
+}
+
+.btn-plus:hover {
+  background: #d8e3ff;
+}
+
+
   </style>
 </head>
 
@@ -126,7 +155,10 @@
   </div>
 
   <div class="container">
-    <h1 id="titolo">Aggiungi Elemento alla Lista Musica</h1>
+<div class="title-row">
+  <button class="btn-plus" onclick="salvaElemento()">+</button>
+  <h1 id="titolo">Aggiungi Elemento alla Lista Musica</h1>
+</div>
 
     <label>Testo</label>
     <input type="text" id="campo-testo" placeholder="Inserisci il testo">
