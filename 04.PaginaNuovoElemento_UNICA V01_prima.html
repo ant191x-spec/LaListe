@@ -115,7 +115,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.9rem;
+  gap: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
@@ -157,7 +157,7 @@
   <div class="container">
 <div class="title-row">
   <button class="btn-plus" onclick="salvaElemento()">+</button>
-  <h1 id="titolo">Aggiungi Elemento: Musica</h1>
+  <h1 id="titolo">Aggiungi Elemento Musica</h1>
 </div>
 
     <label>Testo</label>
@@ -194,7 +194,7 @@
         listaCorrente = btn.dataset.tab;
 
         document.getElementById("titolo").textContent =
-          "Aggiungi Elemento: " +
+          "Aggiungi Elemento " +
           listaCorrente.charAt(0).toUpperCase() + listaCorrente.slice(1);
       });
     });
