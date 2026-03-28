@@ -85,6 +85,27 @@
       color: #9ca3af;
     }
 
+.header-flex {
+  display: flex;
+  gap: 1rem; /* distanza tra titolo e + */
+  align-items: center;
+}
+
+.btn-plus {
+  padding: 0.4rem 0.8rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 6px;
+  border: 1px solid #cbd5f5;
+  background: #e5edff;
+  color: #1d3bb8;
+  cursor: pointer;
+}
+
+.btn-plus:hover {
+  background: #d8e3ff;
+}
+
     /* 📱 MOBILE FIXES — senza cambiare dimensioni */
     @media (max-width: 480px) {
 
@@ -108,9 +129,11 @@
 </head>
 
 <body>
-  <header>
-    <h1>Le mie liste</h1>
-  </header>
+<header class="header-flex">
+  <h1>Le mie liste</h1>
+  <button class="btn-plus" onclick="apriPaginaUnica()">+</button>
+</header>
+
 
   <main>
     <section class="grid">
@@ -209,6 +232,11 @@
     aggiornaLista("ricette");
     aggiornaLista("compleanni");
     aggiornaLista("altro");
+
+window.apriPaginaUnica = function () {
+  window.location.href = "04.PaginaNuovoElemento_UNICA V01_prima.html";
+};
+
   </script>
 </body>
 </html>
