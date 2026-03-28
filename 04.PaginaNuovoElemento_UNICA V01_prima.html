@@ -138,6 +138,10 @@
   background: #d8e3ff;
 }
 
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
 
   </style>
 </head>
@@ -148,16 +152,16 @@
 
   <!-- 🔝 TABS -->
   <div class="tabs">
-    <button class="tab-btn active" data-tab="musica">Musica</button>
+    <button class="tab-btn" data-tab="musica">Musica</button>
     <button class="tab-btn" data-tab="ricette">Ricette</button>
     <button class="tab-btn" data-tab="compleanni">Compleanni</button>
     <button class="tab-btn" data-tab="altro">Altro</button>
   </div>
 
-  <div class="container">
+<div class="container disabled" id="form-container">
 <div class="title-row">
   <button class="btn-plus" onclick="salvaElemento()">+</button>
-  <h1 id="titolo">Aggiungi Elemento Musica</h1>
+  <h1 id="titolo">Seleziona una Lista</h1>
 </div>
 
     <label>Testo</label>
@@ -175,7 +179,7 @@
 
   <script type="module">
     const utente = "utente1";
-    let listaCorrente = "musica"; // default
+    let listaCorrente = null; // nessuna lista default
 
     // 🔔 Mostra notifica se ok=1
     const params = new URLSearchParams(window.location.search);
@@ -186,29 +190,39 @@
     }
 
     // 🔄 Cambio tab
-    document.querySelectorAll(".tab-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
 
-        listaCorrente = btn.dataset.tab;
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
 
-        document.getElementById("titolo").textContent =
-          "Aggiungi Elemento " +
-          listaCorrente.charAt(0).toUpperCase() + listaCorrente.slice(1);
-      });
-    });
+    listaCorrente = btn.dataset.tab;
+
+    document.getElementById("titolo").textContent =
+      "Aggiungi Elemento alla Lista " +
+      listaCorrente.charAt(0).toUpperCase() + listaCorrente.slice(1);
+
+    // 🔓 Abilita il form
+    document.getElementById("form-container").classList.remove("disabled");
+  });
+});
 
     // 💾 Salva elemento
-    window.salvaElemento = async function () {
-      const testo = document.getElementById("campo-testo").value.trim();
-      const note = document.getElementById("campo-note").value.trim();
-      const link = document.getElementById("campo-link").value.trim();
+window.salvaElemento = async function () {
+  if (!listaCorrente) {
+    alert("Seleziona prima una lista.");
+    return;
+  }
 
-      if (!testo) {
-        alert("Il campo Testo è obbligatorio.");
-        return;
-      }
+  const testo = document.getElementById("campo-testo").value.trim();
+  const note = document.getElementById("campo-note").value.trim();
+  const link = document.getElementById("campo-link").value.trim();
+
+  if (!testo) {
+    alert("Il campo Testo è obbligatorio.");
+    return;
+  }
+
 
       const { error } = await supabase
         .from(listaCorrente)
