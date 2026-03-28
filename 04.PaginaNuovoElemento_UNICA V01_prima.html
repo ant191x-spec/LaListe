@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aggiungi Elemento - Pagina Unica</title>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js";
+
+    const supabaseUrl = "https://wuaptfrhsbeezdmwlmyh.supabase.co";
+    const supabaseKey = "sb_publishable_jccRCJKOQzMlGTBj1dRbXQ_JayL41tV";
+
+    window.supabase = createClient(supabaseUrl, supabaseKey);
+  </script>
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f7fb;
+      padding: 1.5rem;
+      color: #222;
+      font-size: 0.9rem;
+    }
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 0.5rem; /* spazio orizzontale */
+  row-gap: 0.02rem;    /* spazio verticale più piccolo */
+  max-width: 400px;
+  margin: 0 auto 0.5rem auto;
+}
+
+.tab-btn {
+  padding: 0.5rem 1.1rem; /* più piccoli */
+  border-radius: 4px;
+  border: 1px solid #cbd5f5;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.9rem; /* leggermente più piccolo */
+  color: #374151;
+  text-align: center;
+}
+
+.tab-btn.active {
+  background: #e5edff;
+  color: #1d3bb8;
+  border-color: #a5b4fc;
+  font-weight: 600;
+}
+
+    .notifica {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+      padding: 0.8rem 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      display: none;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 10px;
+      border: 1px solid #e1e5f0;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.2rem;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.3rem;
+      border-radius: 6px;
+      border: 1px solid #cbd5f5;
+      font-size: 0.9rem;
+    }
+
+    button {
+      margin-top: 0.3rem;
+      padding: 0.6rem 0.9rem;
+      border-radius: 6px;
+      border: 1px solid #cbd5f5;
+      background: #e5edff;
+      color: #1d3bb8;
+      cursor: pointer;
+      width: 100%;
+      font-size: 0.9rem;
+    }
+
+    button.secondary {
+      background: #fff;
+      color: #374151;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="notifica" class="notifica">Elemento aggiunto con successo!</div>
+
+  <!-- 🔝 TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="musica">Musica</button>
+    <button class="tab-btn" data-tab="ricette">Ricette</button>
+    <button class="tab-btn" data-tab="compleanni">Compleanni</button>
+    <button class="tab-btn" data-tab="altro">Altro</button>
+  </div>
+
+  <div class="container">
+    <h1 id="titolo">Aggiungi Elemento alla Lista Musica</h1>
+
+    <label>Testo</label>
+    <input type="text" id="campo-testo" placeholder="Inserisci il testo">
+
+    <label>Note</label>
+    <textarea id="campo-note" rows="4" placeholder="Aggiungi eventuali note"></textarea>
+
+    <label>Link</label>
+    <input type="text" id="campo-link" placeholder="https://...">
+
+    <button onclick="salvaElemento()">Salva Elemento</button>
+    <button class="secondary" onclick="tornaHome()">Torna alla Home</button>
+  </div>
+
+  <script type="module">
+    const utente = "utente1";
+    let listaCorrente = "musica"; // default
+
+    // 🔔 Mostra notifica se ok=1
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("ok") === "1") {
+      const box = document.getElementById("notifica");
+      box.style.display = "block";
+      setTimeout(() => box.style.display = "none", 3000);
+    }
+
+    // 🔄 Cambio tab
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        listaCorrente = btn.dataset.tab;
+
+        document.getElementById("titolo").textContent =
+          "Aggiungi Elemento alla Lista " +
+          listaCorrente.charAt(0).toUpperCase() + listaCorrente.slice(1);
+      });
+    });
+
+    // 💾 Salva elemento
+    window.salvaElemento = async function () {
+      const testo = document.getElementById("campo-testo").value.trim();
+      const note = document.getElementById("campo-note").value.trim();
+      const link = document.getElementById("campo-link").value.trim();
+
+      if (!testo) {
+        alert("Il campo Testo è obbligatorio.");
+        return;
+      }
+
+      const { error } = await supabase
+        .from(listaCorrente)
+        .insert({
+          utente: utente,
+          testo: testo,
+          note: note,
+          link: link
+        });
+
+      if (error) {
+        console.error("Errore salvataggio:", error);
+        alert("Errore durante il salvataggio.");
+        return;
+      }
+
+      window.location.href = window.location.pathname + "?ok=1";
+    };
+
+    // 🔙 Torna alla Home
+    window.tornaHome = function () {
+      window.location.href = "00.PaginaHome_Liste V08_aggiungi2.html";
+    };
+  </script>
+
+</body>
+</html>
