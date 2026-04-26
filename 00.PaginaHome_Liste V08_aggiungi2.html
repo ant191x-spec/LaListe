@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- 🔥 ESSENZIALE PER MOBILE -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Liste personali (Supabase)</title>
 
   <!-- Import Supabase -->
@@ -22,7 +22,7 @@
       margin: 0;
       padding: 0;
       color: #222;
-      font-size: 1rem; /* stessa dimensione */
+      font-size: 1rem;
     }
 
     header {
@@ -65,7 +65,7 @@
       background: #e5edff;
       color: #1d3bb8;
       cursor: pointer;
-      font-size: 0.9rem; /* stessa dimensione */
+      font-size: 0.9rem;
     }
 
     button.secondary {
@@ -85,30 +85,28 @@
       color: #9ca3af;
     }
 
-.header-flex {
-  display: flex;
-  gap: 1rem; /* distanza tra titolo e + */
-  align-items: center;
-}
+    .header-flex {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
 
-.btn-plus {
-  padding: 0.4rem 0.8rem;
-  font-size: 1.2rem;
-  font-weight: bold;
-  border-radius: 6px;
-  border: 1px solid #cbd5f5;
-  background: #e5edff;
-  color: #1d3bb8;
-  cursor: pointer;
-}
+    .btn-plus {
+      padding: 0.4rem 0.8rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-radius: 6px;
+      border: 1px solid #cbd5f5;
+      background: #e5edff;
+      color: #1d3bb8;
+      cursor: pointer;
+    }
 
-.btn-plus:hover {
-  background: #d8e3ff;
-}
+    .btn-plus:hover {
+      background: #d8e3ff;
+    }
 
-    /* 📱 MOBILE FIXES — senza cambiare dimensioni */
     @media (max-width: 480px) {
-
       header {
         padding: 1rem;
       }
@@ -118,11 +116,11 @@
       }
 
       .grid {
-        grid-template-columns: 1fr; /* una card per riga */
+        grid-template-columns: 1fr;
       }
 
       .card {
-        padding: 1.2rem; /* leggermente più compatto */
+        padding: 1.2rem;
       }
     }
   </style>
@@ -134,109 +132,112 @@
   <button class="btn-plus" onclick="apriPaginaUnica()">+</button>
 </header>
 
+<main>
+  <section class="grid">
 
-  <main>
-    <section class="grid">
+    <!-- MUSICA -->
+    <article class="card">
+      <h2>Musica</h2>
+      <div class="buttons">
+        <button class="secondary" onclick="apriLista('musica')">Apri Lista Musica</button>
+        <button onclick="apriPaginaNuovo('musica')">Aggiungi Elemento</button>
+      </div>
+      <ul class="lista" id="lista-musica"></ul>
+    </article>
 
-      <!-- MUSICA -->
-      <article class="card">
-        <h2>Musica</h2>
-        <div class="buttons">
-          <button class="secondary" onclick="apriLista('musica')">Apri Lista Musica</button>
-          <button onclick="apriPaginaNuovo('musica')">Aggiungi Elemento</button>
-        </div>
-        <ul class="lista" id="lista-musica"></ul>
-      </article>
+    <!-- RICETTE -->
+    <article class="card">
+      <h2>Ricette</h2>
+      <div class="buttons">
+        <button class="secondary" onclick="apriLista('ricette')">Apri Lista Ricette</button>
+        <button onclick="apriPaginaNuovo('ricette')">Aggiungi Elemento</button>
+      </div>
+      <ul class="lista" id="lista-ricette"></ul>
+    </article>
 
-      <!-- RICETTE -->
-      <article class="card">
-        <h2>Ricette</h2>
-        <div class="buttons">
-          <button class="secondary" onclick="apriLista('ricette')">Apri Lista Ricette</button>
-          <button onclick="apriPaginaNuovo('ricette')">Aggiungi Elemento</button>
-        </div>
-        <ul class="lista" id="lista-ricette"></ul>
-      </article>
+    <!-- COMPLEANNI -->
+    <article class="card">
+      <h2>Compleanni</h2>
+      <div class="buttons">
+        <button class="secondary" onclick="apriLista('compleanni')">Apri Lista Compleanni</button>
+        <button onclick="apriPaginaNuovo('compleanni')">Aggiungi Elemento</button>
+      </div>
+      <ul class="lista" id="lista-compleanni"></ul>
+    </article>
 
-      <!-- COMPLEANNI -->
-      <article class="card">
-        <h2>Compleanni</h2>
-        <div class="buttons">
-          <button class="secondary" onclick="apriLista('compleanni')">Apri Lista Compleanni</button>
-          <button onclick="apriPaginaNuovo('compleanni')">Aggiungi Elemento</button>
-        </div>
-        <ul class="lista" id="lista-compleanni"></ul>
-      </article>
+    <!-- ALTRO -->
+    <article class="card">
+      <h2>Altro</h2>
+      <div class="buttons">
+        <button class="secondary" onclick="apriLista('altro')">Apri Lista Altro</button>
+        <button onclick="apriPaginaNuovo('altro')">Aggiungi Elemento</button>
+      </div>
+      <ul class="lista" id="lista-altro"></ul>
+    </article>
 
-      <!-- ALTRO -->
-      <article class="card">
-        <h2>Altro</h2>
-        <div class="buttons">
-          <button class="secondary" onclick="apriLista('altro')">Apri Lista Altro</button>
-          <button onclick="apriPaginaNuovo('altro')">Aggiungi Elemento</button>
-        </div>
-        <ul class="lista" id="lista-altro"></ul>
-      </article>
+  </section>
+</main>
 
-    </section>
-  </main>
+<script type="module">
+  const utente = "utente1";
 
-  <script type="module">
-    const utente = "utente1";
+  function accorcia(testo, max = 22) {
+    if (!testo) return "";
+    return testo.length > max ? testo.substring(0, max) + "..." : testo;
+  }
 
-    async function caricaLista(nomeTabella) {
-      const { data, error } = await supabase
-        .from(nomeTabella)
-        .select("testo")
-        .eq("utente", utente)
-        .order("id", { ascending: false })
-        .limit(6);
+  async function caricaLista(nomeTabella) {
+    const { data, error } = await supabase
+      .from(nomeTabella)
+      .select("testo")
+      .eq("utente", utente)
+      .order("id", { ascending: false })
+      .limit(6);
 
-      if (error) return [];
+    if (error || !data) return [];
 
-      return data.reverse().map(r => r.testo);
+    return data.reverse().map(r => r.testo);
+  }
+
+  async function aggiornaLista(nome) {
+    const ul = document.getElementById("lista-" + nome);
+    ul.innerHTML = "";
+
+    const elementi = await caricaLista(nome);
+
+    if (elementi.length === 0) {
+      const li = document.createElement("li");
+      li.textContent = "Nessun elemento ancora.";
+      li.className = "vuota";
+      ul.appendChild(li);
+      return;
     }
 
-    async function aggiornaLista(nome) {
-      const ul = document.getElementById("lista-" + nome);
-      ul.innerHTML = "";
+    elementi.forEach(testo => {
+      const li = document.createElement("li");
+      li.textContent = accorcia(String(testo), 22);
+      ul.appendChild(li);
+    });
+  }
 
-      const elementi = await caricaLista(nome);
+  function apriLista(nome) {
+    window.location.href = "03.PaginaListaElemento_V01_ok.html?lista=" + nome;
+  }
 
-      if (elementi.length === 0) {
-        const li = document.createElement("li");
-        li.textContent = "Nessun elemento ancora.";
-        li.className = "vuota";
-        ul.appendChild(li);
-        return;
-      }
+  window.apriPaginaNuovo = function (nome) {
+    window.location.href = "01.PaginaNuovoElemento_V02_ok.html?lista=" + nome;
+  };
 
-      elementi.forEach(testo => {
-        const li = document.createElement("li");
-        li.textContent = testo;
-        ul.appendChild(li);
-      });
-    }
+  window.apriLista = apriLista;
 
-    function apriLista(nome) {
-      window.location.href = "03.PaginaListaElemento_V01_ok.html?lista=" + nome;
-    }
+  window.apriPaginaUnica = function () {
+    window.location.href = "04.PaginaNuovoElemento_UNICA V01_prima.html";
+  };
 
-    window.apriPaginaNuovo = function (nome) {
-      window.location.href = "01.PaginaNuovoElemento_V02_ok.html?lista=" + nome;
-    };
-
-    window.apriLista = apriLista;
-
-    aggiornaLista("musica");
-    aggiornaLista("ricette");
-    aggiornaLista("compleanni");
-    aggiornaLista("altro");
-
-window.apriPaginaUnica = function () {
-  window.location.href = "04.PaginaNuovoElemento_UNICA V01_prima.html";
-};
-
-  </script>
+  aggiornaLista("musica");
+  aggiornaLista("ricette");
+  aggiornaLista("compleanni");
+  aggiornaLista("altro");
+</script>
 </body>
 </html>
