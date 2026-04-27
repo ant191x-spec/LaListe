@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lista Spesa</title>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js";
+
+    // 🔧 INSERISCI QUI I TUOI DATI SUPABASE
+    const supabaseUrl = "https://wuaptfrhsbeezdmwlmyh.supabase.co";
+    const supabaseKey = "sb_publishable_jccRCJKOQzMlGTBj1dRbXQ_JayL41tV";
+
+    window.supabase = createClient(supabaseUrl, supabaseKey);
+  </script>
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f7fb;
+      padding: 2rem;
+      color: #222;
+      font-size: 0.9rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 10px;
+      border: 1px solid #e1e5f0;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+      overflow-x: auto;
+    }
+
+.filtri-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.filtro-label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.filtro-select {
+  padding: 0.4rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5f5;
+  background: #fff;
+  color: #374151;
+  font-size: 0.8rem; /* stessa dimensione dei bottoni */
+  cursor: pointer;
+}
+
+.filtri-titolo {
+  font-weight: 600;
+  color: #374151;
+  margin-right: 0.5rem;
+}
+
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      table-layout: fixed;
+    }
+
+    th, td {
+      padding: 0.7rem;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+      vertical-align: top;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.3rem;
+    }
+
+    th {
+      background: #f3f4f6;
+      font-weight: 600;
+    }
+
+    button {
+      padding: 0.4rem 0.7rem;
+      border-radius: 6px;
+      border: 1px solid #cbd5f5;
+      background: #e5edff;
+      color: #1d3bb8;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    button.secondary {
+      background: #fff;
+      color: #374151;
+      margin-right: 0.5rem;
+    }
+
+    .top-buttons {
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    select {
+      padding: 0.5rem;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      border-radius: 6px;
+      border: 1px solid #cbd5f5;
+    }
+
+.stato-icon {
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.stato-icon:hover {
+  opacity: 1;
+  transform: scale(1.12);
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+
+/* riga titolo categoria */
+.tr-categoria-titolo > td {
+  background: #eef2ff;
+  font-weight: 600;
+  border-top: 2px solid #c7d2fe;
+  font-size: 0.9rem;
+  padding: 0.2rem 0.6rem;   /* 🔥 altezza più bassa */
+}
+
+/* contenuto interno del titolo: categoria a sinistra, Stato a destra */
+.categoria-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* etichetta "Stato" */
+.categoria-header-stato {
+  color: #6b7280;
+  padding-right: 20px;       /* 🔥 sposta un po’ verso sinistra */
+}
+
+/* cella delle icone SI/NO */
+.td-stato {
+  text-align: right;
+  padding-right: 30px;       /* 🔥 stessa posizione della label "Stato" */
+}
+
+
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+<div class="header-row">
+  <h1>Lista Spesa</h1>
+
+  <div class="header-buttons">
+    <button class="secondary" onclick="tornaHome()">Torna alla Home</button>
+    <button onclick="scaricaCSV()">Scarica in CSV</button>
+  </div>
+</div>
+
+<div class="filtri-container">
+  
+  <span class="filtro-label">Categoria:</span>
+  <select id="filtroCategoria" class="filtro-select">
+    <option value="">Tutte</option>
+  </select>
+
+  <span class="filtro-label">Stato:</span>
+  <select id="filtroStato" class="filtro-select">
+    <option value="">Tutti</option>
+    <option value="true">SI</option>
+    <option value="false">NO</option>
+  </select>
+
+</div>
+
+
+    <table>
+
+      <tbody id="tabella"></tbody>
+    </table>
+  </div>
+
+  <script type="module">
+
+    const filtroCategoria = document.getElementById("filtroCategoria");
+    const tbody = document.getElementById("tabella");
+
+    // 📌 Carica categorie nel filtro
+    async function caricaCategorie() {
+      const { data, error } = await supabase
+        .from("spesa")
+        .select("categoria");
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      const categorie = [...new Set(data.map(r => r.categoria))];
+
+      categorie.forEach(cat => {
+        if (!cat) return;
+        const opt = document.createElement("option");
+        opt.value = cat;
+        opt.textContent = cat;
+        filtroCategoria.appendChild(opt);
+      });
+    }
+
+    // 📌 Carica lista filtrata
+async function caricaLista() {
+  let query = supabase.from("spesa").select("*").order("categoria", { ascending: true }).order("id", { ascending: true });
+
+  if (filtroCategoria.value !== "") {
+    query = query.eq("categoria", filtroCategoria.value);
+  }
+
+  if (filtroStato.value !== "") {
+    query = query.eq("stato", filtroStato.value === "true");
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error(error);
+    alert("Errore nel caricamento della lista.");
+    return;
+  }
+
+  tbody.innerHTML = "";
+
+  // 📌 Raggruppa per categoria
+  const gruppi = {};
+  data.forEach(riga => {
+    if (!gruppi[riga.categoria]) gruppi[riga.categoria] = [];
+    gruppi[riga.categoria].push(riga);
+  });
+
+  // 📌 Genera HTML per ogni categoria
+  Object.keys(gruppi).forEach(categoria => {
+
+    // 🔹 Titolo categoria
+const trTitolo = document.createElement("tr");
+trTitolo.className = "tr-categoria-titolo";
+trTitolo.innerHTML = `
+  <td colspan="2">
+    <div class="categoria-header-row">
+      <span>${categoria}</span>
+      <span class="categoria-header-stato">Stato</span>
+    </div>
+  </td>
+`;
+tbody.appendChild(trTitolo);
+
+
+
+
+
+
+    // 🔹 Righe della categoria
+    gruppi[categoria].forEach(riga => {
+      const tr = document.createElement("tr");
+
+tr.innerHTML = `
+  <td>${riga.testo || ""}</td>
+  <td class="td-stato">
+    <span onclick="toggleStato(${riga.id}, ${riga.stato})">
+      ${riga.stato
+        ? `<svg class="stato-icon" viewBox="0 0 24 24">
+             <circle cx="12" cy="12" r="10" fill="#22c55e"/>
+           </svg>`
+        : `<svg class="stato-icon" viewBox="0 0 24 24">
+             <circle cx="12" cy="12" r="10" fill="none" stroke="#9ca3af" stroke-width="2"/>
+           </svg>`
+      }
+    </span>
+  </td>
+`;
+
+
+
+
+      tbody.appendChild(tr);
+    });
+  });
+
+
+      // Attiva listener checkbox
+      document.querySelectorAll("input[type='checkbox']").forEach(chk => {
+        chk.addEventListener("change", aggiornaStato);
+      });
+    }
+
+    // 🔄 Aggiorna solo la colonna "stato"
+    async function aggiornaStato(event) {
+      const id = event.target.dataset.id;
+      const nuovoStato = event.target.checked;
+
+      const { error } = await supabase
+        .from("spesa")
+        .update({ stato: nuovoStato })
+        .eq("id", id);
+
+      if (error) {
+        console.error(error);
+        alert("Errore durante l'aggiornamento dello stato");
+      }
+    }
+
+    // 🏠 Torna alla Home
+    window.tornaHome = function () {
+      window.location.href = "00.PaginaHome_Liste V08_aggiungi2.html";
+    };
+
+    // 📥 Scarica CSV
+    window.scaricaCSV = function () {
+      const righe = [...document.querySelectorAll("#tabella tr")].map(tr =>
+        [...tr.children].map(td => `"${td.textContent.replace(/"/g, '""')}"`).join(",")
+      );
+
+      const csv = "Elemento,Note,Categoria,Stato\n" + righe.join("\n");
+
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "spesa.csv";
+      a.click();
+
+      URL.revokeObjectURL(url);
+    };
+
+    // EVENTI
+    filtroCategoria.addEventListener("change", caricaLista);
+    filtroStato.addEventListener("change", caricaLista);
+
+
+    // AVVIO
+    caricaCategorie();
+    caricaLista();
+  
+window.toggleStato = async function (id, statoAttuale) {
+  const nuovoStato = !statoAttuale;
+
+  const { error } = await supabase
+    .from("spesa")
+    .update({ stato: nuovoStato })
+    .eq("id", id);
+
+  if (error) {
+    console.error(error);
+    alert("Errore durante l'aggiornamento dello stato");
+    return;
+  }
+
+  // Ricarica la lista per aggiornare l'icona
+  caricaLista();
+};
+
+
+  </script>
+
+</body>
+</html>
