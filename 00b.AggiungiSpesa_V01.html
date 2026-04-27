@@ -116,21 +116,18 @@
   <div class="container" id="form-container">
 
     <div class="title-row">
-      <button class="btn-plus" onclick="salvaElemento()">+</button>
       <h1>Aggiungi Elemento Spesa</h1>
+      <button class="btn-plus" onclick="salvaElemento()">+</button>
     </div>
-
-    <label>Elemento</label>
-    <input type="text" id="campo-testo" placeholder="Inserisci l'elemento">
-
-    <label>Note</label>
-    <textarea id="campo-note" rows="3" placeholder="Aggiungi eventuali note"></textarea>
 
     <label>Categoria</label>
     <input type="text" id="campo-categoria" placeholder="Es. Frutta, Carne, Casa...">
 
+    <label>Elemento</label>
+    <input type="text" id="campo-testo" placeholder="Inserisci l'elemento">
+
     <label>Stato</label>
-    <input type="checkbox" id="campo-stato"> Comprato
+    <input type="checkbox" id="campo-stato"> 
 
     <button onclick="salvaElemento()">Salva Elemento</button>
     <button class="secondary" onclick="tornaHome()">Torna alla Home</button>
@@ -150,7 +147,6 @@
     // 💾 Salva elemento nella tabella SPESA
     window.salvaElemento = async function () {
       const testo = document.getElementById("campo-testo").value.trim();
-      const note = document.getElementById("campo-note").value.trim();
       const categoria = document.getElementById("campo-categoria").value.trim();
       const stato = document.getElementById("campo-stato").checked;
 
@@ -164,7 +160,6 @@
         .insert({
           utente: utente,
           testo: testo,
-          note: note,
           categoria: categoria,
           stato: stato
         });
