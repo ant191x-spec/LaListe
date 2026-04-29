@@ -19,7 +19,7 @@
     body {
       font-family: system-ui, sans-serif;
       background: #f5f7fb;
-      padding: 2rem;
+      padding: 1rem;
       color: #222;
       font-size: 0.9rem;
     }
@@ -141,6 +141,12 @@
   margin-bottom: 1rem;
 }
 
+.title-with-plus {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem; /* distanza tra titolo e + */
+}
+
 .header-buttons {
   display: flex;
   gap: 0.5rem;
@@ -175,6 +181,33 @@
   padding-right: 30px;       /* 🔥 stessa posizione della label "Stato" */
 }
 
+.btn-plus {
+  width: 0.25rem;
+  height: 0.25rem;
+  padding: 0.75rem;
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: 1px solid #cbd5f5;
+  background: #e5edff;
+  cursor: pointer;
+  padding. 0;
+  line-height: 1; /* 🔥 evita che il + scenda troppo */
+}
+
+.btn-plus:hover {
+  background: #d8e3ff;
+}
+
+.title-with-plus h1 {
+margin: 0;          /* elimina margini verticali */
+  line-height: 1;     /* allinea perfettamente al centro */
+  display: flex;
+  align-items: center;
+}
+
 
   </style>
 </head>
@@ -183,11 +216,13 @@
 
   <div class="container">
 <div class="header-row">
-  <h1>Lista Spesa</h1>
+  <div class="title-with-plus">
+    <h1>Lista Spesa</h1>
+    <button class="btn-plus" onclick="tornaHome()">+</button>
+  </div>
 
   <div class="header-buttons">
-    <button class="secondary" onclick="tornaHome()">Torna alla Home</button>
-    <button onclick="scaricaCSV()">Scarica in CSV</button>
+    <button class="secondary" onclick="scaricaCSV()">Scarica</button>
   </div>
 </div>
 
@@ -299,14 +334,16 @@ tr.innerHTML = `
   <td>${riga.testo || ""}</td>
   <td class="td-stato">
     <span onclick="toggleStato(${riga.id}, ${riga.stato})">
-      ${riga.stato
-        ? `<svg class="stato-icon" viewBox="0 0 24 24">
-             <circle cx="12" cy="12" r="10" fill="#22c55e"/>
-           </svg>`
-        : `<svg class="stato-icon" viewBox="0 0 24 24">
-             <circle cx="12" cy="12" r="10" fill="none" stroke="#9ca3af" stroke-width="2"/>
-           </svg>`
-      }
+${riga.stato
+  ? `<svg class="stato-icon" viewBox="0 0 24 24">
+       <circle cx="12" cy="12" r="10" fill="#22c55e"/>
+       <path d="M8 12.5l3 3 5-6" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+     </svg>`
+  : `<svg class="stato-icon" viewBox="0 0 24 24">
+       <circle cx="12" cy="12" r="10" fill="none" stroke="#9ca3af" stroke-width="2"/>
+     </svg>`
+}
+
     </span>
   </td>
 `;
