@@ -8,6 +8,10 @@
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js";
 
+    // 🔧 INSERISCI QUI I TUOI DATI SUPABASE
+    const supabaseUrl = "https://wuaptfrhsbeezdmwlmyh.supabase.co";
+    const supabaseKey = "sb_publishable_jccRCJKOQzMlGTBj1dRbXQ_JayL41tV";
+
     window.supabase = createClient(supabaseUrl, supabaseKey);
   </script>
 
@@ -55,14 +59,15 @@
       font-size: 0.9rem;
     }
 
-    input, textarea, select {
-      width: 100%;
-      padding: 0.6rem;
-      margin-top: 0.3rem;
-      border-radius: 6px;
-      border: 1px solid #cbd5f5;
-      font-size: 0.9rem;
-    }
+input:not([type="checkbox"]), textarea, select {
+  width: 100%;
+  padding: 0.6rem;
+  margin-top: 0.3rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5f5;
+  font-size: 0.9rem;
+}
+
 
     button {
       margin-top: 0.8rem;
@@ -101,11 +106,83 @@
       border: 1px solid #cbd5f5;
       background: #e5edff;
       cursor: pointer;
+      transform: translateY(-10px);
     }
 
     .btn-plus:hover {
       background: #d8e3ff;
     }
+
+.stato-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* ⬅️ allinea tutto a sinistra */
+ width: 100%;  
+  gap: 0.6rem;
+  margin-top: 1rem;
+text-align: left; /* ⬅️ forza l’allineamento a sinistra */
+}
+
+.stato-row label {
+  margin: 0;
+}
+
+
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* centro il gruppo + titolo */
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.btn-plus {
+  width: 0.29rem;
+  height: 0.29rem;
+  padding: 0.9rem;
+  font-size: 1.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: 1px solid #cbd5f5;
+  background: #e5edff;
+  cursor: pointer;
+}
+
+.btn-plus:hover {
+  background: #d8e3ff;
+}
+
+.categoria-row {
+  display: flex;                 
+  align-items: center;
+  justify-content: space-between; /* titolo a sinistra, tasti a destra */
+  margin-top: 1rem;
+}
+
+.categoria-buttons {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.categoria-buttons button {
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid #cbd5f5;
+  background: #e5edff;
+  color: #1d3bb8;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.categoria-buttons button:hover {
+  background: #d8e3ff;
+}
+
+
   </style>
 </head>
 
@@ -115,26 +192,44 @@
 
   <div class="container" id="form-container">
 
-    <div class="title-row">
-      <h1>Aggiungi Elemento Spesa</h1>
-      <button class="btn-plus" onclick="salvaElemento()">+</button>
-    </div>
+<div class="title-row">
+  <button class="btn-plus" onclick="salvaElemento()">+</button>
+  <h1>Aggiungi Elemento Spesa</h1>
+</div>
 
-    <label>Categoria</label>
-    <input type="text" id="campo-categoria" placeholder="Es. Frutta, Carne, Casa...">
 
-    <label>Elemento</label>
+<div class="categoria-row">
+  <label>Indica la Categoria</label>
+
+  <div class="categoria-buttons">
+    <button type="button" onclick="setCategoria('Negozio')">Negozio</button>
+    <button type="button" onclick="setCategoria('Biocoop')">Biocoop</button>
+    <button type="button" onclick="setCategoria('Decathlon')">Decathlon</button>
+  </div>
+</div>
+  <input type="text" id="campo-categoria" placeholder="Es. Frutta, Carne, Casa...">
+
+
+    <label>Nome dell'Elemento da acquistare</label>
     <input type="text" id="campo-testo" placeholder="Inserisci l'elemento">
 
-    <label>Stato</label>
-    <input type="checkbox" id="campo-stato"> 
+<div class="stato-row">
+  <label for="campo-stato">Stato</label>
+  <input type="checkbox" id="campo-stato">
+</div>
+
+
 
     <button onclick="salvaElemento()">Salva Elemento</button>
-    <button class="secondary" onclick="tornaHome()">Torna alla Home</button>
+    <button class="secondary" onclick="tornaHome()">Apri Lista della Spesa</button>
   </div>
 
   <script type="module">
     const utente = "utente1";
+
+window.setCategoria = function (valore) {
+  document.getElementById("campo-categoria").value = valore;
+};
 
     // 🔔 Notifica se ok=1
     const params = new URLSearchParams(window.location.search);
@@ -175,7 +270,7 @@
 
     // 🔙 Torna alla Home
     window.tornaHome = function () {
-      window.location.href = "00.PaginaHome_Liste V08_aggiungi2.html";
+      window.location.href = "00a.HomeSpesa_V01.html";
     };
   </script>
 
