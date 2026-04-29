@@ -208,6 +208,36 @@ margin: 0;          /* elimina margini verticali */
   align-items: center;
 }
 
+.stato-buttons {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+}
+
+.btn-stato {
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5f5;
+  background: #fff;
+  color: #374151;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.btn-stato.active {
+  background: #e5edff;
+  color: #1d3bb8;
+  border-color: #9db4ff;
+}
+
+@media (max-width: 600px) {
+  .filtro-select {
+    font-size: 0.75rem;   /* più piccola */
+    padding: 0.25rem 0.45rem; /* meno alta */
+    max-width: 180px;     /* evita che diventi enorme */
+  }
+}
+
 
   </style>
 </head>
@@ -226,21 +256,27 @@ margin: 0;          /* elimina margini verticali */
   </div>
 </div>
 
-<div class="filtri-container">
-  
-  <span class="filtro-label">Categoria:</span>
-  <select id="filtroCategoria" class="filtro-select">
-    <option value="">Tutte</option>
-  </select>
+<div class="filtri-container" style="flex-direction: column; align-items: flex-start; gap: 0.6rem;">
 
-  <span class="filtro-label">Stato:</span>
-  <select id="filtroStato" class="filtro-select">
-    <option value="">Tutti</option>
-    <option value="true">SI</option>
-    <option value="false">NO</option>
-  </select>
+  <!-- FILTRO CATEGORIA -->
+  <div>
+    <span class="filtro-label">Categoria:</span>
+    <select id="filtroCategoria" class="filtro-select">
+      <option value="">Tutte</option>
+    </select>
+  </div>
+
+  <!-- FILTRO STATO CON 3 BOTTONI -->
+  <div>
+    <div class="stato-buttons">
+      <button class="btn-stato active" data-value="">Tutto</button>
+      <button class="btn-stato" data-value="false">Da fare</button>
+      <button class="btn-stato" data-value="true">Fatto</button>
+    </div>
+  </div>
 
 </div>
+
 
 
     <table>
@@ -280,13 +316,20 @@ margin: 0;          /* elimina margini verticali */
 async function caricaLista() {
   let query = supabase.from("spesa").select("*").order("categoria", { ascending: true }).order("id", { ascending: true });
 
-  if (filtroCategoria.value !== "") {
-    query = query.eq("categoria", filtroCategoria.value);
-  }
+// 📌 Applica filtro Categoria
+if (filtroCategoria.value !== "") {
+  query = query.eq("categoria", filtroCategoria.value);
+}
 
-  if (filtroStato.value !== "") {
-    query = query.eq("stato", filtroStato.value === "true");
-  }
+// 📌 Applica filtro Stato SOLO se non è "Tutto"
+if (filtroStato === "true") {
+  query = query.eq("stato", true);
+}
+
+if (filtroStato === "false") {
+  query = query.eq("stato", false);
+}
+
 
   const { data, error } = await query;
 
@@ -315,7 +358,6 @@ trTitolo.innerHTML = `
   <td colspan="2">
     <div class="categoria-header-row">
       <span>${categoria}</span>
-      <span class="categoria-header-stato">Stato</span>
     </div>
   </td>
 `;
@@ -404,7 +446,22 @@ ${riga.stato
 
     // EVENTI
     filtroCategoria.addEventListener("change", caricaLista);
-    filtroStato.addEventListener("change", caricaLista);
+let filtroStato = ""; // valore attuale del filtro
+
+document.querySelectorAll(".btn-stato").forEach(btn => {
+  btn.addEventListener("click", () => {
+
+    // aggiorna valore
+    filtroStato = btn.dataset.value;
+
+    // aggiorna stile attivo
+    document.querySelectorAll(".btn-stato").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    // ricarica lista
+    caricaLista();
+  });
+});
 
 
     // AVVIO
