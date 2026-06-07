@@ -129,6 +129,21 @@
   transition: opacity 0.2s, transform 0.15s;
 }
 
+.delete-icon {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.2s, transform 0.15s;
+  margin-left: 10px;
+}
+
+.delete-icon:hover {
+  opacity: 1;
+  transform: scale(1.12);
+}
+
+
 .stato-icon:hover {
   opacity: 1;
   transform: scale(1.12);
@@ -315,6 +330,7 @@ margin: 0;          /* elimina margini verticali */
     // 📌 Carica lista filtrata
 async function caricaLista() {
   let query = supabase.from("spesa").select("*").order("categoria", { ascending: true }).order("id", { ascending: true });
+query = query.eq("eliminato", "0");
 
 // 📌 Applica filtro Categoria
 if (filtroCategoria.value !== "") {
@@ -374,19 +390,29 @@ tbody.appendChild(trTitolo);
 
 tr.innerHTML = `
   <td>${riga.testo || ""}</td>
-  <td class="td-stato">
-    <span onclick="toggleStato(${riga.id}, ${riga.stato})">
-${riga.stato
-  ? `<svg class="stato-icon" viewBox="0 0 24 24">
-       <circle cx="12" cy="12" r="10" fill="#22c55e"/>
-       <path d="M8 12.5l3 3 5-6" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-     </svg>`
-  : `<svg class="stato-icon" viewBox="0 0 24 24">
-       <circle cx="12" cy="12" r="10" fill="none" stroke="#9ca3af" stroke-width="2"/>
-     </svg>`
-}
+<td class="td-stato">
 
-    </span>
+  <!-- ICONA STATO -->
+  <span onclick="toggleStato(${riga.id}, ${riga.stato})">
+    ${riga.stato
+      ? `<svg class="stato-icon" viewBox="0 0 24 24">
+           <circle cx="12" cy="12" r="10" fill="#22c55e"/>
+           <path d="M8 12.5l3 3 5-6" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+         </svg>`
+      : `<svg class="stato-icon" viewBox="0 0 24 24">
+           <circle cx="12" cy="12" r="10" fill="none" stroke="#9ca3af" stroke-width="2"/>
+         </svg>`
+    }
+  </span>
+
+<!-- ICONA CESTINO -->
+<img src="https://img.icons8.com/ios-glyphs/30/9ca3af/trash.png"
+     class="delete-icon"
+     onclick="segnaEliminato(${riga.id})">
+
+
+</td>
+
   </td>
 `;
 
@@ -484,6 +510,20 @@ window.toggleStato = async function (id, statoAttuale) {
 
   // Ricarica la lista per aggiornare l'icona
   caricaLista();
+};
+window.segnaEliminato = async function (id) {
+  const { error } = await supabase
+    .from("spesa")
+    .update({ eliminato: true })
+    .eq("id", id);
+
+  if (error) {
+    console.error(error);
+    alert("Errore durante l'aggiornamento della colonna eliminato");
+    return;
+  }
+
+  caricaLista(); // aggiorna la tabella
 };
 
 
