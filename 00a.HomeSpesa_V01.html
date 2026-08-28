@@ -64,6 +64,23 @@
   margin-right: 0.5rem;
 }
 
+.filtro-eliminati {
+  margin-right: auto;            /* allinea a destra */
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid #f5c2c7;
+  background: #f8d7da;
+  color: #b71c1c;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: 0.15s;
+}
+
+.filtro-eliminati.active {
+  background: #b71c1c;
+  color: white;
+  border-color: #7f0000;
+}
 
     table {
       width: 100%;
@@ -287,6 +304,7 @@ margin: 0;          /* elimina margini verticali */
       <button class="btn-stato active" data-value="">Tutto</button>
       <button class="btn-stato" data-value="false">Da fare</button>
       <button class="btn-stato" data-value="true">Fatto</button>
+      <button class="filtro-eliminati" data-value="false">Eliminati</button>
     </div>
   </div>
 
@@ -330,7 +348,13 @@ margin: 0;          /* elimina margini verticali */
     // 📌 Carica lista filtrata
 async function caricaLista() {
   let query = supabase.from("spesa").select("*").order("categoria", { ascending: true }).order("id", { ascending: true });
-query = query.eq("eliminato", "0");
+if (filtroStato === "eliminati") {
+  query = query.eq("eliminato", true);
+} else {
+  query = query.eq("eliminato", false);
+}
+
+
 
 // 📌 Applica filtro Categoria
 if (filtroCategoria.value !== "") {
@@ -445,6 +469,28 @@ tr.innerHTML = `
         alert("Errore durante l'aggiornamento dello stato");
       }
     }
+
+const btnEliminati = document.querySelector(".filtro-eliminati");
+
+btnEliminati.addEventListener("click", () => {
+
+  // attiva/disattiva
+  btnEliminati.classList.toggle("active");
+
+  // se attivo → mostra eliminati
+  if (btnEliminati.classList.contains("active")) {
+    filtroStato = "eliminati";
+  } else {
+    filtroStato = "";
+  }
+
+  // aggiorna bottoni stato (togli active)
+  document.querySelectorAll(".btn-stato").forEach(b => b.classList.remove("active"));
+
+  caricaLista();
+});
+
+
 
     // 🏠 Torna alla Home
     window.tornaHome = function () {
