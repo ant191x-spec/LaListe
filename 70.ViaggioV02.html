@@ -32,6 +32,29 @@ h1{
     color:#1d3bb8;
 }
 
+.filtri-container{
+    display:flex;
+    gap:.4rem;
+    margin-bottom:1.5rem;
+    flex-wrap:wrap;
+}
+
+.btn-filtro{
+    padding:0.35rem 0.7rem;
+    border-radius:6px;
+    border:1px solid #cbd5f5;
+    background:#fff;
+    color:#374151;
+    cursor:pointer;
+    font-size:0.8rem;
+}
+
+.btn-filtro.active{
+    background:#e5edff;
+    color:#1d3bb8;
+    border-color:#9db4ff;
+}
+
 .essenziali-grid{
     display:grid;
     grid-template-columns:repeat(2,1fr);
@@ -40,25 +63,42 @@ h1{
 }
 
 .essenziale-card{
-    background:#e5edff;
+    background:#e3fcef;
     border:1px solid #cbd5f5;
     border-radius:10px;
     padding:1rem;
     text-align:center;
     font-weight:600;
-    color:#1d3bb8;
+    color:#298f72;
 }
 
 .categoria{
     margin-top:1.2rem;
 }
 
-.categoria-titolo{
-    background:#eef2ff;
-    font-weight:600;
-    border-top:2px solid #c7d2fe;
-    padding:.5rem .8rem;
-    border-radius:6px 6px 0 0;
+.categoria-titolo {
+    background: #eef2ff;
+    font-weight: 600;
+    border-top: 2px solid #c7d2fe;
+    padding: .5rem .8rem;
+    border-radius: 6px 6px 0 0;
+
+
+    display: flex;
+    /* justify-content: space-between; <-- RIMUOVI O COMMENTA QUESTA RIGA */
+    align-items: center;
+    gap: 12px; /* <-- AGGIUNGI QUESTO: crea uno spazio fisso tra il testo e il pulsante */
+}
+
+.btn-categoria{
+    padding:0.25rem 0.6rem;
+    border-radius:6px;
+    border:1px solid #cbd5f5;
+    background:#e5edff;
+    text-align: left;
+    color:#1d3bb8;
+    cursor:pointer;
+    font-size:.75rem;
 }
 
 .lista-elementi{
@@ -126,11 +166,28 @@ h1{
 
 </style>
 </head>
+
 <body>
 
 <div class="container">
 
 <h1>🚉 Prepara il tuo Viaggio!</h1>
+
+<div class="filtri-container">
+
+    <button class="btn-filtro active" id="btnTutti">
+        Tutti
+    </button>
+
+    <button class="btn-filtro" id="btnAttivi">
+        Attivi
+    </button>
+
+    <button class="btn-filtro" id="btnDaFare">
+        Da Fare
+    </button>
+
+</div>
 
 <div class="essenziali-grid">
     <div class="essenziale-card">Chiavi</div>
@@ -144,6 +201,9 @@ h1{
 </div>
 
 <script>
+
+let filtroAttivi = false;
+let filtroDaFare = false;
 
 const categorie = {
 
@@ -196,7 +256,6 @@ const categorie = {
 "Occhiali da sole",
 "Lenzuola"
 ],
-
 "Cibo":[
 "Cibo dal frigo",
 "Acqua",
@@ -271,7 +330,18 @@ Object.entries(categorie).forEach(([categoria, elementi]) => {
     blocco.className = "categoria";
 
     let html = `
-        <div class="categoria-titolo">${categoria}</div>
+        <div class="categoria-titolo">
+
+            <span>${categoria}</span>
+
+            <button
+                class="btn-categoria"
+                onclick="toggleCategoria(this)">
+                Blocca Tutto
+            </button>
+
+        </div>
+
         <ul class="lista-elementi">
     `;
 
@@ -322,7 +392,40 @@ document.addEventListener("click", function(e){
     riga.classList.toggle("bloccato");
     riga.classList.toggle("attivo");
 
+    applicaFiltri();
+
 });
+
+function toggleCategoria(btn){
+
+    const categoria = btn.closest(".categoria");
+
+    const righe = categoria.querySelectorAll("li");
+
+    const tutteBloccate =
+        [...righe].every(riga =>
+            riga.classList.contains("bloccato")
+        );
+
+    righe.forEach(riga => {
+
+        if(tutteBloccate){
+
+            riga.classList.remove("bloccato");
+            riga.classList.add("attivo");
+
+        }else{
+
+            riga.classList.remove("attivo");
+            riga.classList.add("bloccato");
+
+        }
+
+    });
+
+    applicaFiltri();
+
+}
 
 function toggleCheck(event, el){
 
@@ -368,7 +471,84 @@ function toggleCheck(event, el){
 
         </svg>`;
     }
+
+    applicaFiltri();
+
 }
+
+function applicaFiltri(){
+
+    document.querySelectorAll(".lista-elementi li").forEach(riga => {
+
+        let visibile = true;
+
+        if(filtroAttivi){
+
+            if(riga.classList.contains("bloccato")){
+                visibile = false;
+            }
+
+        }
+
+        if(filtroDaFare){
+
+            const check = riga.querySelector(".check-btn");
+
+            if(check?.dataset.checked === "true"){
+                visibile = false;
+            }
+
+        }
+
+        riga.style.display = visibile ? "flex" : "none";
+
+    });
+
+}
+
+document.getElementById("btnTutti").addEventListener("click", () => {
+
+    filtroAttivi = false;
+    filtroDaFare = false;
+
+    document.querySelectorAll(".btn-filtro").forEach(btn =>
+        btn.classList.remove("active")
+    );
+
+    document.getElementById("btnTutti")
+        .classList.add("active");
+
+    applicaFiltri();
+
+});
+
+document.getElementById("btnAttivi").addEventListener("click", () => {
+
+    filtroAttivi = !filtroAttivi;
+
+    document.getElementById("btnAttivi")
+        .classList.toggle("active", filtroAttivi);
+
+    document.getElementById("btnTutti")
+        .classList.remove("active");
+
+    applicaFiltri();
+
+});
+
+document.getElementById("btnDaFare").addEventListener("click", () => {
+
+    filtroDaFare = !filtroDaFare;
+
+    document.getElementById("btnDaFare")
+        .classList.toggle("active", filtroDaFare);
+
+    document.getElementById("btnTutti")
+        .classList.remove("active");
+
+    applicaFiltri();
+
+});
 
 </script>
 
