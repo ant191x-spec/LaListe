@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prepara il tuo Viaggio!</title>
+
+<style>
+
+body{
+    font-family:system-ui,sans-serif;
+    background:#f5f7fb;
+    padding:1rem;
+    color:#222;
+    font-size:.9rem;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    background:#fff;
+    padding:1.5rem;
+    border-radius:10px;
+    border:1px solid #e1e5f0;
+    box-shadow:0 4px 10px rgba(15,23,42,.05);
+}
+
+h1{
+    margin-top:0;
+    margin-bottom:1rem;
+    font-size:1.6rem;
+    color:#1d3bb8;
+}
+
+.essenziali-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-bottom:2rem;
+}
+
+.essenziale-card{
+    background:#e5edff;
+    border:1px solid #cbd5f5;
+    border-radius:10px;
+    padding:1rem;
+    text-align:center;
+    font-weight:600;
+    color:#1d3bb8;
+}
+
+.categoria{
+    margin-top:1.2rem;
+}
+
+.categoria-titolo{
+    background:#eef2ff;
+    font-weight:600;
+    border-top:2px solid #c7d2fe;
+    padding:.5rem .8rem;
+    border-radius:6px 6px 0 0;
+}
+
+.lista-elementi{
+    list-style:none;
+    margin:0;
+    padding:0;
+    border:1px solid #e5e7eb;
+    border-top:none;
+}
+
+.lista-elementi li{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:.75rem .8rem;
+    border-bottom:1px solid #e5e7eb;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.lista-elementi li:last-child{
+    border-bottom:none;
+}
+
+.lista-elementi li.bloccato{
+    color:#9ca3af;
+    opacity:.45;
+}
+
+.lista-elementi li.attivo{
+    color:#222;
+    opacity:1;
+    background:#f8fbff;
+}
+
+.testo{
+    flex:1;
+}
+
+.check-btn{
+    display:flex;
+    align-items:center;
+    flex-shrink:0;
+    margin-left:12px;
+}
+
+.stato-icon{
+    width:26px;
+    height:26px;
+    cursor:pointer;
+}
+
+.stato-icon:hover{
+    transform:scale(1.1);
+}
+
+@media(max-width:600px){
+
+    .essenziale-card{
+        font-size:.9rem;
+        padding:.8rem;
+    }
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>🚉 Prepara il tuo Viaggio!</h1>
+
+<div class="essenziali-grid">
+    <div class="essenziale-card">Chiavi</div>
+    <div class="essenziale-card">Cellulare</div>
+    <div class="essenziale-card">Portafogli</div>
+    <div class="essenziale-card">Carta d'identità</div>
+</div>
+
+<div id="contenitoreListe"></div>
+
+</div>
+
+<script>
+
+const categorie = {
+
+"Viaggio breve":[
+"Sveglia",
+"Biglietto Treno",
+"Biglietto Metro RATP",
+"Cuffiette",
+"Deodorante",
+"Spazzolino",
+"Dentifricio",
+"Badge Lavoro",
+"Acqua o Borraccia",
+"Valigia e zaino",
+"Cambio mutande",
+"Pigiama",
+"Camicia o Polo",
+"Giacca",
+"Pantalone",
+"Scarpe",
+"Infradito",
+"Caricatore Cell",
+"PC",
+"Caricatore PC",
+"Bancomat aziendale",
+"Hotel",
+"Cuscino Gonfiabile",
+"Film",
+"Cintura"
+],
+
+"Vestiti":[
+"3 Mutande",
+"3 Calze",
+"Pigiama pantalone",
+"Pigiama maglia",
+"3 Magliette",
+"3 Camicie",
+"3 Maglioni",
+"2 Pantaloni",
+"Scarpe",
+"Infradito",
+"Sciarpa per dormire",
+"Busta biancheria sporca",
+"Cintura",
+"Cuscino Gonfiabile",
+"Costume da bagno",
+"Asciugamano da mare",
+"Cappellino sole",
+"Occhiali da sole",
+"Lenzuola"
+],
+
+"Cibo":[
+"Cibo dal frigo",
+"Acqua",
+"Tuc",
+"Taralli",
+"Pane",
+"Dolce colazione",
+"Zaino termico",
+"Ghiaccioli freezer",
+"Bicchieri plastica",
+"Forchetta",
+"Coltello",
+"Apri bottiglie",
+"Molletta cibo"
+],
+
+"Igiene":[
+"Deodorante",
+"Profumo",
+"Spazzolino",
+"Dentifricio",
+"Fazzoletti",
+"Shampoo",
+"Sapone",
+"Asciugamano doccia",
+"Saponetta da viaggio"
+],
+
+"Lavoro":[
+"Caricabat cell",
+"Caricabat pc",
+"Cell aziendale",
+"Pc",
+"Mouse",
+"Cuffie Jabra",
+"Badge Lavoro"
+],
+
+"Tempo Libero":[
+"Quaderno",
+"Penna",
+"Libri",
+"Giochi viaggio",
+"Binocolo"
+],
+
+"Bici":[
+"Caricabat bici elett",
+"Pompa bici",
+"Copertone nuovo",
+"Smonta copertone"
+],
+
+"Campeggio":[
+"Zaino leggerissimo scout",
+"Tenda",
+"Cuscini",
+"Materassi",
+"Sacchi a pelo invernali",
+"Luce",
+"Powerbank",
+"Crema solare"
+]
+
+};
+
+const contenitore = document.getElementById("contenitoreListe");
+
+Object.entries(categorie).forEach(([categoria, elementi]) => {
+
+    const blocco = document.createElement("div");
+    blocco.className = "categoria";
+
+    let html = `
+        <div class="categoria-titolo">${categoria}</div>
+        <ul class="lista-elementi">
+    `;
+
+    elementi.forEach(voce => {
+
+        html += `
+        <li class="attivo">
+
+            <span class="testo">${voce}</span>
+
+            <span class="check-btn"
+                  onclick="toggleCheck(event,this)">
+
+                <svg class="stato-icon" viewBox="0 0 24 24">
+                    <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill="none"
+                        stroke="#9ca3af"
+                        stroke-width="2"/>
+                </svg>
+
+            </span>
+
+        </li>
+        `;
+
+    });
+
+    html += `
+        </ul>
+    `;
+
+    blocco.innerHTML = html;
+    contenitore.appendChild(blocco);
+
+});
+
+document.addEventListener("click", function(e){
+
+    const riga = e.target.closest(".lista-elementi li");
+
+    if(!riga) return;
+
+    if(e.target.closest(".check-btn")) return;
+
+    riga.classList.toggle("bloccato");
+    riga.classList.toggle("attivo");
+
+});
+
+function toggleCheck(event, el){
+
+    event.stopPropagation();
+
+    const checked = el.dataset.checked === "true";
+
+    if(checked){
+
+        el.dataset.checked = "false";
+
+        el.innerHTML = `
+        <svg class="stato-icon" viewBox="0 0 24 24">
+            <circle
+                cx="12"
+                cy="12"
+                r="10"
+                fill="none"
+                stroke="#9ca3af"
+                stroke-width="2"/>
+        </svg>`;
+
+    } else {
+
+        el.dataset.checked = "true";
+
+        el.innerHTML = `
+        <svg class="stato-icon" viewBox="0 0 24 24">
+
+            <circle
+                cx="12"
+                cy="12"
+                r="10"
+                fill="#22c55e"/>
+
+            <path
+                d="M8 12.5l3 3 5-6"
+                stroke="white"
+                stroke-width="2.5"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"/>
+
+        </svg>`;
+    }
+}
+
+</script>
+
+</body>
+</html>
