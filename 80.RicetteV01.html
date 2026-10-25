@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lista Ricette</title>
+
+<style>
+
+body{
+    font-family:system-ui,sans-serif;
+    background:#f5f7fb;
+    padding:1rem;
+    color:#222;
+    font-size:.9rem;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    background:#fff;
+    padding:1.5rem;
+    border-radius:10px;
+    border:1px solid #e1e5f0;
+    box-shadow:0 4px 10px rgba(15,23,42,.05);
+}
+
+h1{
+    margin-top:0;
+    margin-bottom:1rem;
+    font-size:1.6rem;
+    color:#1d3bb8;
+}
+
+.filtri-container{
+    margin-bottom:1.5rem;
+}
+
+.filtri-riga{
+    display:grid;
+    gap:10px;
+    margin-bottom:10px;
+}
+
+.filtri-riga.riga1{
+    grid-template-columns:repeat(2,1fr);
+}
+
+.filtri-riga.riga2{
+    grid-template-columns:repeat(3,1fr);
+}
+
+.btn-filtro{
+    width:100%;
+    padding:.8rem;
+    border-radius:8px;
+    border:1px solid #cbd5f5;
+    background:#eef2ff;
+    color:#374151;
+    cursor:pointer;
+    font-size:.9rem;
+    font-weight:600;
+}
+
+.btn-filtro:hover{
+    background:#e5edff;
+}
+
+.btn-filtro.active{
+    background:#cddcff;
+    color:#1d3bb8;
+    border-color:#9db4ff;
+}
+
+.lista-ricette{
+    list-style:none;
+    margin:0;
+    padding:0;
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+    overflow:hidden;
+}
+
+.lista-ricette li{
+    padding:.85rem;
+    border-bottom:1px solid #e5e7eb;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.lista-ricette li:last-child{
+    border-bottom:none;
+}
+
+.lista-ricette li:hover{
+    background:#f8fbff;
+}
+
+.nome-ricetta{
+    font-weight:500;
+}
+
+.categoria{
+    color:#6b7280;
+    font-size:.8rem;
+    margin-left:8px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🍽️ Lista Ricette</h1>
+
+    <div class="filtri-container">
+
+        <div class="filtri-riga riga1">
+
+            <button class="btn-filtro" onclick="filtra('Antipasto',this)">
+                Antipasti
+            </button>
+
+            <button class="btn-filtro" onclick="filtra('PrimoSecondo',this)">
+                Primi e Secondi
+            </button>
+
+        </div>
+
+        <div class="filtri-riga riga2">
+
+            <button class="btn-filtro" onclick="filtra('Dolce',this)">
+                Dolci
+            </button>
+
+            <button class="btn-filtro" onclick="filtra('Bevanda',this)">
+                Bevande
+            </button>
+
+            <button class="btn-filtro" onclick="filtra('Altro',this)">
+                Altro
+            </button>
+
+        </div>
+
+    </div>
+
+    <ul id="listaRicette" class="lista-ricette"></ul>
+
+</div>
+
+<script>
+
+/* =====================================================
+   LISTA RICETTE
+   AGGIUNGI QUI LE RICETTE
+===================================================== */
+
+const RICETTE = [
+
+    {
+        nome: "Tiramisù di Mamma",
+        categoria: "Dolce"
+    },
+
+    {
+        nome: "Limoncello",
+        categoria: "Bevanda"
+    },
+    {
+        nome: "Pizza (per Forno a Legna)",
+        categoria: "Primi e Secondi",
+        link: "http://test"
+    },
+];
+
+/* ===================================================== */
+
+const PAGINA_DETTAGLIO = "81.RicetteDettagliV01.html";
+
+const listaRicette = document.getElementById("listaRicette");
+
+let filtroAttivo = null;
+
+function apriRicetta(nomeRicetta){
+
+    const url =
+        PAGINA_DETTAGLIO +
+        "?ricetta=" +
+        encodeURIComponent(nomeRicetta);
+
+    window.location.href = url;
+
+}
+
+function caricaRicette(){
+
+    listaRicette.innerHTML = "";
+
+    let ricette = [...RICETTE];
+
+    ricette.sort((a,b)=>
+        a.nome.localeCompare(b.nome,"it")
+    );
+
+    if(filtroAttivo){
+        ricette = ricette.filter(r =>
+            r.categoria === filtroAttivo
+        );
+    }
+
+    ricette.forEach(ricetta => {
+
+        const li = document.createElement("li");
+
+        li.onclick = () => apriRicetta(ricetta.nome);
+
+        li.innerHTML = `
+            <span class="nome-ricetta">
+                ${ricetta.nome}
+                <span class="categoria">
+                    (${ricetta.categoria})
+                </span>
+            </span>
+        `;
+
+        listaRicette.appendChild(li);
+
+    });
+
+}
+
+function filtra(categoria, bottone){
+
+    if(filtroAttivo === categoria){
+
+        filtroAttivo = null;
+
+        document
+            .querySelectorAll(".btn-filtro")
+            .forEach(btn =>
+                btn.classList.remove("active")
+            );
+
+    }else{
+
+        filtroAttivo = categoria;
+
+        document
+            .querySelectorAll(".btn-filtro")
+            .forEach(btn =>
+                btn.classList.remove("active")
+            );
+
+        bottone.classList.add("active");
+
+    }
+
+    caricaRicette();
+
+}
+
+caricaRicette();
+
+</script>
+
+</body>
+</html>
